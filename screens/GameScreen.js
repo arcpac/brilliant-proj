@@ -1,9 +1,17 @@
-import { Alert, StyleSheet, Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import Title from "../components/Title";
+import { AntDesign } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
 import NumberContainer from "../components/game/ui/NumberContainer";
 import PrimaryButton from "../components/PrimaryButton";
+import LogItem from "../components/game/ui/LogItem";
 
 function generateRandomBetween(max, min, exclude) {
   const randomNumber = Math.floor(Math.random() * (max - min)) + min;
@@ -20,12 +28,19 @@ let maxBoundary = 100;
 function GameScreen({ userNumber, onGameOver }) {
   const initialGuess = generateRandomBetween(100, 1, userNumber);
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
+  const [logs, setLogs] = useState([{ number: initialGuess, direction: "" }]);
+  const { width, height } = useWindowDimensions();
 
   useEffect(() => {
     if (currentGuess === userNumber) {
       onGameOver();
     }
   }, [currentGuess, userNumber, onGameOver]);
+
+  useEffect(() => {
+    minBoundary = 1;
+    maxBoundary = 100;
+  }, []);
 
   function nextGuessHandler(direction) {
     if (
@@ -50,29 +65,70 @@ function GameScreen({ userNumber, onGameOver }) {
       currentGuess
     );
     setCurrentGuess(newRandomNumber);
+    setLogs((prevGuessRounds) => [
+      { number: newRandomNumber, direction: direction },
+      ...prevGuessRounds,
+    ]);
   }
-
-  return (
-    <View style={styles.container}>
-      <Title>Opponent's Guess</Title>
+  console.log(width)
+  let content = (
+    <>
       <View style={styles.contentContainer}>
         <NumberContainer myStyle={myStyle}>{currentGuess}</NumberContainer>
       </View>
       <View style={styles.buttonsContainer}>
         <View style={styles.buttonContainer}>
           <PrimaryButton onPress={nextGuessHandler.bind(this, "lower")}>
-            <Ionicons name="remove" />
+            <AntDesign name="downsquare" size={24} color="white" />
           </PrimaryButton>
         </View>
         <View style={styles.buttonContainer}>
           <PrimaryButton onPress={nextGuessHandler.bind(this, "higher")}>
-            <Ionicons name="add-circle" />
+            <AntDesign name="upsquare" size={24} color="white" />
           </PrimaryButton>
         </View>
       </View>
-      <View style={styles.footerContainer}>
-        <PrimaryButton onPress={onGameOver}>Quit</PrimaryButton>
+    </>
+  );
+  if (width > 395) {
+    content = (
+      <>
+        <View style={styles.landscapeContainer}>
+          <View style={styles.buttonContainer}>
+            <PrimaryButton onPress={nextGuessHandler.bind(this, "lower")}>
+              <AntDesign name="downsquare" size={24} color="white" />
+            </PrimaryButton>
+          </View>
+          <View>
+            <NumberContainer myStyle={myStyle}>{currentGuess}</NumberContainer>
+          </View>
+          <View style={styles.buttonContainer}>
+            <PrimaryButton onPress={nextGuessHandler.bind(this, "higher")}>
+              <AntDesign name="upsquare" size={24} color="white" />
+            </PrimaryButton>
+          </View>
+        </View>
+      </>
+    );
+  }
+  return (
+    <View style={styles.container}>
+      <Title>Opponent's Guess</Title>
+      {content}
+      {}
+      <View style={styles.logsContainer}>
+        <FlatList
+          data={logs}
+          renderItem={(itemData) => {
+            console.log(itemData);
+            return <LogItem data={itemData} />;
+          }}
+          keyExtractor={(item) => item.number}
+        />
       </View>
+      {/* <View style={styles.footerContainer}>
+        <PrimaryButton onPress={onGameOver}>Quit</PrimaryButton>
+      </View> */}
     </View>
   );
 }
@@ -82,19 +138,15 @@ export default GameScreen;
 const styles = StyleSheet.create({
   container: {
     marginTop: 10,
-    justifyContent: "center",
     alignItems: "center",
-    flexDirection: "column",
     flex: 1,
   },
   contentContainer: {
-    // backgroundColor: "gray",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 50,
     padding: 10,
     marginHorizontal: 24,
-    // flex: 1,
   },
   buttonsContainer: {
     flexDirection: "row",
@@ -107,7 +159,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     padding: 10,
-    // fontSize: 36,
     marginTop: 20,
   },
   title: {
@@ -124,6 +175,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     flex: 3,
+  },
+  logsContainer: {
+    flex: 1,
+    padding: 16,
+  },
+  landscapeContainer: {
+    marginTop: 20,
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
 
