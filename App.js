@@ -15,11 +15,12 @@ export default function App() {
   }
 
   function gameOverHandler() {
+    // mainMenu();
     setGameIsOver(true);
   }
 
-  function mainMenu() {
-    setUserNumber();
+  function startNewGameHandler() {
+    setUserNumber(null);
   }
 
   let screen = <StartGame onPickNumber={pickedNumberHandler} />;
@@ -31,7 +32,7 @@ export default function App() {
   }
 
   if (gameIsOver && userNumber) {
-    screen = <GameOver onGameOver={mainMenu} userNumber={userNumber} />;
+    screen = <GameOver onGameOver={startNewGameHandler} userNumber={userNumber} />;
   }
 
   return (
@@ -44,6 +45,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
 });

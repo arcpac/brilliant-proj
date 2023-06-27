@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 
 function Title({ children }) {
   return (
@@ -8,21 +8,20 @@ function Title({ children }) {
   );
 }
 export default Title;
-
 const styles = StyleSheet.create({
   container: {
-    marginTop: 100,
     borderColor: "#f3f6f4",
     borderWidth: 2,
     textAlign: "center",
     marginHorizontal: 24,
-    // justifyContent: 'center'
+    maxWidth: "80%",
+    width: 500,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#f3f6f4",
-    textAlign: 'center',
-    padding: 20
+    textAlign: "center",
+    padding: 20,
   },
 });
